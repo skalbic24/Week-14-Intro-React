@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 interface EditTaskModalProps {
     isOpen: boolean;
@@ -9,6 +9,11 @@ interface EditTaskModalProps {
 
 const EditTaskModal: React.FC<EditTaskModalProps> = ({ isOpen, currentTaskText, onClose, onUpdate }) => {
     const [task, setTask] = useState(currentTaskText);
+
+    // Update local state when currentTaskText changes
+    useEffect(() => {
+        setTask(currentTaskText);
+    }, [currentTaskText]);
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
@@ -39,7 +44,7 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({ isOpen, currentTaskText, 
 
 const modalStyles = {
     overlay: {
-        position: 'fixed' as 'fixed', // Explicitly set the type
+        position: 'fixed' as 'fixed',
         top: 0,
         left: 0,
         right: 0,

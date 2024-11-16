@@ -1,64 +1,57 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 
 interface TaskInputProps {
     onAddMustDo: (task: string) => void;
     onAddSaveLater: (task: string) => void;
-    currentTaskText: string; // Add prop for current task text
-    onUpdateTask: (task: string) => void; // Add prop for updating task
+    currentTaskText: string;
+    onUpdateTask: (task: string) => void;
 }
 
 const TaskInput: React.FC<TaskInputProps> = ({ onAddMustDo, onAddSaveLater, currentTaskText, onUpdateTask }) => {
-    const [task, setTask] = useState<string>("");
+    const [inputValue, setInputValue] = React.useState<string>(currentTaskText);
 
-    useEffect(() => {
-        setTask(currentTaskText); // Set task text for editing
+    React.useEffect(() => {
+        setInputValue(currentTaskText); // Update input value when currentTaskText changes
     }, [currentTaskText]);
 
-    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
-        if (task) {
-            if (currentTaskText) {
-                onUpdateTask(task); // Update task if editing
-            } else {
-                onAddMustDo(task); // Add new task
-            }
-            setTask("");
+    const handleAddMustDo = () => {
+        if (inputValue.trim()) {
+            onAddMustDo(inputValue);
+            setInputValue("");
         }
     };
 
-    const handleSaveLater = (e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
-        if (task) {
-            onAddSaveLater(task);
-            setTask("");
+    const handleAddSaveLater = () => {
+        if (inputValue.trim()) {
+            onAddSaveLater(inputValue);
+            setInputValue("");
+        }
+    };
+
+    const handleUpdate = () => {
+        if (inputValue.trim()) {
+            onUpdateTask(inputValue); // Call the update function
+            setInputValue("");
         }
     };
 
     return (
-        <div style={{ textAlign: 'center', marginBottom: '20px', marginTop: '10px' }}>
-            <h2 style={{ marginBottom: '10px' }}>To Do Tasks</h2>
-            <form onSubmit={handleSubmit} style={{ display: 'inline-block', marginRight: '10px' }}>
-                <input
-                    type="text"
-                    value={task}
-                    onChange={(e) => setTask(e.target.value)}
-                    placeholder="Enter Task"
+        <div className="input-container">
+            <h2 className="task-title">To Do Tasks</h2>
+            <div className="input-button-container">
+                <input 
+                    type="text" 
+                    value={inputValue} 
+                    onChange={(e) => setInputValue(e.target.value)} 
+                    placeholder="Enter task..."
                 />
-                <button
-                    type="submit"
-                    style={{ backgroundColor: '#4CAF50', color: 'white', fontWeight: 'bold' }}
-                >
-                    {currentTaskText ? "Update Task" : "Add Must Do"} {/* Change button text based on editing state */}
+                <button className="add-must-do" onClick={currentTaskText ? handleUpdate : handleAddMustDo}>
+                    {currentTaskText ? "Update Task" : "Add Must Do"}
                 </button>
-            </form>
-            <form onSubmit={handleSaveLater} style={{ display: 'inline-block' }}>
-                <button
-                    type="submit"
-                    style={{ backgroundColor: '#2196F3', color: 'white', fontWeight: 'bold' }}
-                >
-                    Save Later
+                <button className="add-save-later" onClick={handleAddSaveLater}>
+                    Add Save Later
                 </button>
-            </form>
+            </div>
         </div>
     );
 };

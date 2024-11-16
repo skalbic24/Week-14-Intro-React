@@ -16,6 +16,7 @@ const App: React.FC = () => {
     const [modalOpen, setModalOpen] = useState(false);
     const [currentTaskId, setCurrentTaskId] = useState<number | null>(null);
     const [currentTaskText, setCurrentTaskText] = useState<string>("");
+    const [editingTaskType, setEditingTaskType] = useState<'mustDo' | 'saveLater' | null>(null);
 
     const addMustDoTask = (task: string) => {
         const newTask: Task = { id: Date.now(), task };
@@ -43,20 +44,21 @@ const App: React.FC = () => {
         if (taskToEdit) {
             setCurrentTaskId(id);
             setCurrentTaskText(taskToEdit.task);
+            setEditingTaskType(type); // Set the type of task being edited
             setModalOpen(true);
         }
     };
 
     const updateTask = (updatedTask: string) => {
-        if (currentTaskId !== null) {
-            const isMustDoTask = mustDoTasks.some(t => t.id === currentTaskId);
-            if (isMustDoTask) {
+        if (currentTaskId !== null && editingTaskType) {
+            if (editingTaskType === 'mustDo') {
                 setMustDoTasks(mustDoTasks.map(t => (t.id === currentTaskId ? { ...t, task: updatedTask } : t)));
             } else {
                 setSaveLaterTasks(saveLaterTasks.map(t => (t.id === currentTaskId ? { ...t, task: updatedTask } : t)));
             }
             setCurrentTaskId(null);
             setCurrentTaskText("");
+            setEditingTaskType(null); // Reset editing task type
             setModalOpen(false);
         }
     };

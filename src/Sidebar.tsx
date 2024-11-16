@@ -8,19 +8,26 @@ interface Task {
 interface SidebarProps {
     saveLaterTasks: Task[];
     onDelete: (id: number) => void;
-    onEdit: (id: number, type: 'saveLater') => void; // Pass type to differentiate
+    onEdit: (id: number, type: 'mustDo' | 'saveLater') => void;
 }
 
 const Sidebar: React.FC<SidebarProps> = ({ saveLaterTasks, onDelete, onEdit }) => {
     return (
-        <div className="sidebar-box">
+        <div>
             <h3>Saved for Later</h3>
             <ul>
-                {saveLaterTasks.map(task => (
-                    <li key={task.id}>
-                        {task.task}
-                        <button onClick={() => onEdit(task.id, 'saveLater')} style={{ marginLeft: '5px' }}>Edit</button>
-                        <button onClick={() => onDelete(task.id)} style={{ marginLeft: '5px' }}>Delete</button>
+                {saveLaterTasks.map((task) => (
+                    <li key={task.id} className="task-item">
+                        <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap' }}>
+                            <span role="img" aria-label="task" style={{ marginRight: '8px', lineHeight: '30px' }}>
+                                📅 {/* Emoji here */}
+                            </span>
+                            <span style={{ flexGrow: 1 }}>{task.task}</span>
+                            <div style={{ display: 'flex', alignItems: 'center' }}>
+                                <button className="edit" onClick={() => onEdit(task.id, 'saveLater')}>✏️</button>
+                                <button className="delete" onClick={() => onDelete(task.id)}>❌</button>
+                            </div>
+                        </div>
                     </li>
                 ))}
             </ul>
