@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { testData } from './testData';
 import TaskInput from './TaskInput';
 import TaskList from './TaskList';
 import Sidebar from './Sidebar';
-import './App.css'
+import { testData } from './testData'; // Adjust the import path
+import EditTaskModal from './EditTaskModal';
 
 interface Task {
     id: number;
@@ -13,6 +13,9 @@ interface Task {
 const App: React.FC = () => {
     const [mustDoTasks, setMustDoTasks] = useState<Task[]>(testData.mustDoTasks);
     const [saveLaterTasks, setSaveLaterTasks] = useState<Task[]>(testData.saveLaterTasks);
+    const [modalOpen, setModalOpen] = useState(false);
+    const [currentTaskId, setCurrentTaskId] = useState<number | null>(null);
+    const [currentTaskText, setCurrentTaskText] = useState<string>("");
 
     const addMustDoTask = (task: string) => {
         const newTask: Task = { id: Date.now(), task };
@@ -32,43 +35,52 @@ const App: React.FC = () => {
         setSaveLaterTasks(saveLaterTasks.filter(task => task.id !== id));
     };
 
-    const editTask = (id: number) => {
-        const taskToEdit = mustDoTasks.find(task => task.id === id);
+    const openEditModal = (id: number, type: 'mustDo' | 'saveLater') => {
+        const taskToEdit = type === 'mustDo'
+            ? mustDoTasks.find(task => task.id === id)
+            : saveLaterTasks.find(task => task.id === id);
+
         if (taskToEdit) {
-            const newTaskName = prompt("Edit task", taskToEdit.task);
-            if (newTaskName) {
-                setMustDoTasks(mustDoTasks.map(task => task.id === id ? { ...task, task: newTaskName } : task));
-            }
+            setCurrentTaskId(id);
+            setCurrentTaskText(taskToEdit.task);
+            setModalOpen(true);
         }
     };
 
-    const editSaveLaterTask = (id: number) => {
-        const taskToEdit = saveLaterTasks.find(task => task.id === id);
-        if (taskToEdit) {
-            const newTaskName = prompt("Edit task", taskToEdit.task);
-            if (newTaskName) {
-                setSaveLaterTasks(saveLaterTasks.map(task => task.id === id ? { ...task, task: newTaskName } : task));
+    const updateTask = (updatedTask: string) => {
+        if (currentTaskId !== null) {
+            const isMustDoTask = mustDoTasks.some(t => t.id === currentTaskId);
+            if (isMustDoTask) {
+                setMustDoTasks(mustDoTasks.map(t => (t.id === currentTaskId ? { ...t, task: updatedTask } : t)));
+            } else {
+                setSaveLaterTasks(saveLaterTasks.map(t => (t.id === currentTaskId ? { ...t, task: updatedTask } : t)));
             }
+            setCurrentTaskId(null);
+            setCurrentTaskText("");
+            setModalOpen(false);
         }
     };
 
     return (
         <div style={{ padding: '20px' }}>
-            {/* Input section at the very top */}
-            <TaskInput onAddMustDo={addMustDoTask} onAddSaveLater={addSaveLaterTask} />
-            {/* Flex container for Main Tasks and Saved for Later */}
+            <TaskInput 
+                onAddMustDo={addMustDoTask} 
+                onAddSaveLater={addSaveLaterTask} 
+                currentTaskText={currentTaskText} 
+                onUpdateTask={updateTask} 
+            />
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <div style={{ flex: 1, marginRight: '20px' }}>
-                    <TaskList tasks={mustDoTasks} onDelete={deleteTask} onEdit={editTask} />
-                </div>
-                <div style={{ width: '200px' }}>
-                    <Sidebar 
-                        saveLaterTasks={saveLaterTasks} 
-                        onDelete={deleteSaveLaterTask} 
-                        onEdit={editSaveLaterTask} 
-                    />
-                </div>
+                <TaskList tasks={mustDoTasks} onDelete={deleteTask} onEdit={openEditModal} />
+                <Sidebar saveLaterTasks={saveLaterTasks} onDelete={deleteSaveLaterTask} onEdit={openEditModal} />
             </div>
+
+            {/* Edit Task Modal */}
+            <EditTaskModal 
+                isOpen={modalOpen} 
+                currentTaskText={currentTaskText} 
+                onClose={() => setModalOpen(false)} 
+                onUpdate={updateTask} 
+            />
         </div>
     );
 };

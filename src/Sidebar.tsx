@@ -1,5 +1,4 @@
 import React from 'react';
-import { Bookmark } from 'lucide-react'
 
 interface Task {
     id: number;
@@ -9,7 +8,7 @@ interface Task {
 interface SidebarProps {
     saveLaterTasks: Task[];
     onDelete: (id: number) => void;
-    onEdit: (id: number) => void;
+    onEdit: (id: number, type: 'saveLater') => void; // Pass type to differentiate
 }
 
 const Sidebar: React.FC<SidebarProps> = ({ saveLaterTasks, onDelete, onEdit }) => {
@@ -18,12 +17,10 @@ const Sidebar: React.FC<SidebarProps> = ({ saveLaterTasks, onDelete, onEdit }) =
             <h3>Saved for Later</h3>
             <ul>
                 {saveLaterTasks.map(task => (
-                    <li key={task.id} >
-                       <div>
-                           <Bookmark size={20}/> {task.task}
-                            <button onClick={() => onEdit(task.id)} style={{ marginLeft: '5px' }}>Edit</button>
-                            <button onClick={() => onDelete(task.id)} style={{ marginLeft: '5px' }}>Delete</button>
-                       </div>
+                    <li key={task.id}>
+                        {task.task}
+                        <button onClick={() => onEdit(task.id, 'saveLater')} style={{ marginLeft: '5px' }}>Edit</button>
+                        <button onClick={() => onDelete(task.id)} style={{ marginLeft: '5px' }}>Delete</button>
                     </li>
                 ))}
             </ul>
