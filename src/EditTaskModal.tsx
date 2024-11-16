@@ -39,7 +39,7 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({ isOpen, currentTaskText, 
 
 const modalStyles = {
     overlay: {
-        position: 'fixed',
+        position: 'fixed' as 'fixed', // Explicitly set the type
         top: 0,
         left: 0,
         right: 0,
@@ -48,13 +48,13 @@ const modalStyles = {
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
-    },
+    } as React.CSSProperties,
     container: {
         background: 'white',
         padding: '20px',
         borderRadius: '5px',
         minWidth: '300px',
-    },
+    } as React.CSSProperties,
 };
 
 export default EditTaskModal;
